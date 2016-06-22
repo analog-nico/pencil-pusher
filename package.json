@@ -2,7 +2,7 @@
   "name": "pencil-pusher",
   "version": "0.1.0",
   "description": "Pushing tasks and eventually workflows -> business process automation",
-  "main": "./lib/index.js",
+  "main": "./index.js",
   "scripts": {
     "test": "./node_modules/.bin/gulp ci"
   },
