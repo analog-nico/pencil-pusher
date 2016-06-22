@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/analog-nico/pencil-pusher#readme",
   "engines": {
-    "node": ">=4"
+    "node": ">=6.2.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
