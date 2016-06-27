@@ -36,7 +36,7 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
-- v0.1.0 (upcoming)
+- v0.0.1 (upcoming)
     - Initial version
 
 ## License (ISC)
