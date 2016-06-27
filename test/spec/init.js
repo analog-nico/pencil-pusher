@@ -1,7 +1,6 @@
 'use strict'
 
 let PencilPusher = require('../../')
-let MemoryPersistenceLayer = require('../fixtures/MemoryPersistenceLayer.js')
 
 describe('During initialization PencilPusher', () => {
 
@@ -41,7 +40,7 @@ describe('During initialization PencilPusher', () => {
 
         expect(() => {
             new PencilPusher({
-                persistenceLayer: new MemoryPersistenceLayer()
+                persistenceLayer: new PencilPusher.MemoryPersistenceLayer()
             })
         }).not.to.throw()
 
