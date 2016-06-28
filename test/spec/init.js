@@ -4,7 +4,7 @@ let PencilPusher = require('../../')
 
 describe('During initialization PencilPusher', () => {
 
-    it('should validate the options', () => {
+    it('should validate the options of new PencilPusher(...)', () => {
 
         expect(() => {
             new PencilPusher()
@@ -36,7 +36,7 @@ describe('During initialization PencilPusher', () => {
             new PencilPusher({
                 persistenceLayer: new PencilPusher.PersistenceLayerBase()
             })
-        }).not.to.throw()
+        }).to.throw('options.persistenceLayer must extend PencilPusher.PersistenceLayerBase')
 
         expect(() => {
             new PencilPusher({
