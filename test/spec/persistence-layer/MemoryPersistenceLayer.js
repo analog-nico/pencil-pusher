@@ -3,7 +3,7 @@
 let _ = require('lodash')
 let moment = require('moment')
 
-let MemoryPersistenceLayer = require('../../lib/persistence-layer/MemoryPersistenceLayer.js')
+let MemoryPersistenceLayer = require('../../../lib/persistence-layer/MemoryPersistenceLayer.js')
 
 
 describe('MemoryPersistenceLayer', () => {
