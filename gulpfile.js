@@ -9,7 +9,8 @@ let rimraf = require('rimraf')
 let coveralls = require('gulp-coveralls')
 let eslint = require('gulp-eslint')
 
-let chai = require("chai")
+let chai = require('chai')
+chai.use(require('chai-as-promised'))
 global.expect = chai.expect
 
 
