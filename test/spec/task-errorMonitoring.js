@@ -357,4 +357,50 @@ describe('The error monitoring for task processing', () => {
 
     })
 
+    it('should catch errors in the error monitoring itself', (done) => {
+
+        let pl = new MemoryPersistenceLayer()
+        let numCalls = 0
+        let origFn = pl.getNextPendingTask
+        pl.getNextPendingTask = (...args) => {
+            numCalls += 1
+            if (numCalls === 1) {
+                throw new Error('Failed!')
+            }
+            return Reflect.apply(origFn, pl, args)
+        }
+
+        let pencilPusher = new PencilPusher({
+            persistenceLayer: pl,
+            errorMonitoring: (xyz) => {
+                throw new Error('monitoring failed')
+            }
+        })
+
+        let stderr = []
+        let origStderrWrite = process.stderr.write
+        process.stderr.write = (string, encoding, fd) => {
+            stderr.push(string)
+        }
+
+        pencilPusher.start()
+
+        setTimeout(() => {
+
+            try {
+
+                process.stderr.write = origStderrWrite
+
+                expect(stderr.join('')).to.contain('monitoring failed')
+
+            } finally {
+                pencilPusher.stop()
+            }
+
+            done()
+
+        }, DEFAULT_RUNNING_TIME)
+
+    })
+
 })
