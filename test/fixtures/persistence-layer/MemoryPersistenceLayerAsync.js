@@ -13,7 +13,7 @@ class MemoryPersistenceLayerAsyc extends MemoryPersistenceLayer {
 
     getNextPendingTask() {
 
-        return BPromise.try(() => {
+        return BPromise.delay(5).then(() => {
             return super.getNextPendingTask()
         })
 
@@ -21,7 +21,7 @@ class MemoryPersistenceLayerAsyc extends MemoryPersistenceLayer {
 
     setTaskProcessingTime({ task, until }) {
 
-        return BPromise.try(() => {
+        return BPromise.delay(5).then(() => {
             return super.setTaskProcessingTime({ task, until })
         })
 
@@ -29,7 +29,7 @@ class MemoryPersistenceLayerAsyc extends MemoryPersistenceLayer {
 
     cancelTaskProcessing({ task, executionFailed, err }) {
 
-        return BPromise.try(() => {
+        return BPromise.delay(5).then(() => {
             return super.cancelTaskProcessing({ task, executionFailed, err })
         })
 
@@ -37,7 +37,7 @@ class MemoryPersistenceLayerAsyc extends MemoryPersistenceLayer {
 
     finishTaskProcessing({ task, retain, retainUntil, storeOutput, output }) {
 
-        return BPromise.try(() => {
+        return BPromise.delay(5).then(() => {
             return super.finishTaskProcessing({ task, retain, retainUntil, storeOutput, output })
         })
 
@@ -45,7 +45,7 @@ class MemoryPersistenceLayerAsyc extends MemoryPersistenceLayer {
 
     getNextPollingTime() {
 
-        return BPromise.try(() => {
+        return BPromise.delay(5).then(() => {
             return super.getNextPollingTime()
         })
 
@@ -53,7 +53,7 @@ class MemoryPersistenceLayerAsyc extends MemoryPersistenceLayer {
 
     storeNewTask({ task }) {
 
-        return BPromise.try(() => {
+        return BPromise.delay(5).then(() => {
             return super.storeNewTask({ task })
         })
 

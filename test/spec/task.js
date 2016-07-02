@@ -289,12 +289,13 @@ describe('PencilPusher\'s task management', () => {
             pencilPusher.scheduleTask({ name: 'simple', input: false, due: moment().unix() }),
             pencilPusher.scheduleTask({ name: 'simple', input: true, due: moment().unix() })
         ])
+            .delay(10)
             .then(() => {
 
                 pencilPusher.start()
 
             })
-            .delay(10)
+            .delay(100)
             .then(() => {
 
                 expect(spyGetNextPendingTask.callCount).to.eql(3)
