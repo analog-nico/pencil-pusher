@@ -1,8 +1,10 @@
 'use strict'
 
+let BPromise = require('bluebird')
 let moment = require('moment')
 let sinon = require('sinon')
 
+let MemoryPersistenceLayerAsync = require('../fixtures/persistence-layer/MemoryPersistenceLayerAsync.js')
 let PencilPusher = require('../../')
 
 
@@ -255,6 +257,59 @@ describe('PencilPusher\'s task management', () => {
             done()
 
         }, 10)
+
+    })
+
+    it('should work with async implementation of the persistence layer', () => {
+
+        let persistenceLayer = new MemoryPersistenceLayerAsync()
+        let spyGetNextPendingTask = sinon.spy(persistenceLayer, 'getNextPendingTask')
+        let spySetTaskProcessingTime = sinon.spy(persistenceLayer, 'setTaskProcessingTime')
+        let spyCancelTaskProcessing = sinon.spy(persistenceLayer, 'cancelTaskProcessing')
+        let spyFinishTaskProcessing = sinon.spy(persistenceLayer, 'finishTaskProcessing')
+        let spyGetNextPollingTime = sinon.spy(persistenceLayer, 'getNextPollingTime')
+        let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
+
+        let pencilPusher = new PencilPusher({
+            persistenceLayer
+        })
+
+        let taskWasExecuted = 0
+
+        pencilPusher.defineTask('simple', {
+            implementation: (throwError) => {
+                taskWasExecuted += 1
+                if (throwError) {
+                    throw new Error('Thrown by task')
+                }
+            }
+        })
+
+        return BPromise.all([
+            pencilPusher.scheduleTask({ name: 'simple', input: false, due: moment().unix() }),
+            pencilPusher.scheduleTask({ name: 'simple', input: true, due: moment().unix() })
+        ])
+            .then(() => {
+
+                pencilPusher.start()
+
+            })
+            .delay(10)
+            .then(() => {
+
+                expect(spyGetNextPendingTask.callCount).to.eql(3)
+                expect(spySetTaskProcessingTime.callCount).to.eql(2)
+                expect(spyCancelTaskProcessing.callCount).to.eql(1)
+                expect(spyFinishTaskProcessing.callCount).to.eql(1)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(2)
+
+            })
+            .finally(() => {
+
+                pencilPusher.stop()
+
+            })
 
     })
 
