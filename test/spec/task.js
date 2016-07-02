@@ -65,6 +65,67 @@ describe('PencilPusher\'s task management', () => {
 
     })
 
+    it('should schedule and process an async task', (done) => {
+
+        let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+        let spyGetNextPendingTask = sinon.spy(persistenceLayer, 'getNextPendingTask')
+        let spySetTaskProcessingTime = sinon.spy(persistenceLayer, 'setTaskProcessingTime')
+        let spyCancelTaskProcessing = sinon.spy(persistenceLayer, 'cancelTaskProcessing')
+        let spyFinishTaskProcessing = sinon.spy(persistenceLayer, 'finishTaskProcessing')
+        let spyGetNextPollingTime = sinon.spy(persistenceLayer, 'getNextPollingTime')
+        let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
+
+        let pencilPusher = new PencilPusher({
+            persistenceLayer
+        })
+
+        let taskWasExecuted = false
+
+        let spyAsyncTask = sinon.spy(() => {
+            taskWasExecuted = true
+        })
+
+        pencilPusher.defineTask('simple', {
+            implementation: () => {
+
+                return BPromise.delay(10)
+                    .then(spyAsyncTask)
+
+            }
+        })
+
+        pencilPusher.scheduleTask({
+            name: 'simple',
+            input: null,
+            due: moment().unix()
+        })
+
+        pencilPusher.start()
+
+        setTimeout(() => {
+
+            try {
+
+                expect(spyGetNextPendingTask.callCount).to.eql(2)
+                expect(spySetTaskProcessingTime.callCount).to.eql(1)
+                expect(spyCancelTaskProcessing.callCount).to.eql(0)
+                expect(spyFinishTaskProcessing.callCount).to.eql(1)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(1)
+
+                expect(taskWasExecuted).to.eql(true)
+                expect(spyAsyncTask.firstCall.calledBefore(spyFinishTaskProcessing.firstCall)).to.eql(true)
+
+            } finally {
+                pencilPusher.stop()
+            }
+
+            done()
+
+        }, DEFAULT_RUNNING_TIME+10)
+
+    })
+
     it('should process two tasks in a sequence', (done) => {
 
         let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
