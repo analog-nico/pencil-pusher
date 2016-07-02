@@ -1,5 +1,6 @@
 'use strict'
 
+let _ = require('lodash')
 let BPromise = require('bluebird')
 let moment = require('moment')
 let sinon = require('sinon')
@@ -248,6 +249,163 @@ describe('PencilPusher\'s task management', () => {
             done()
 
         }, DEFAULT_RUNNING_TIME)
+
+    })
+
+    it('should process and retain a task', (done) => {
+
+        let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+        let origFn = persistenceLayer.finishTaskProcessing
+        let calledWithArgs = null
+        persistenceLayer.finishTaskProcessing = (...args) => {
+            calledWithArgs = _.cloneDeep(args) // ...because the spy doesn't clone the args
+            return Reflect.apply(origFn, persistenceLayer, args)
+        }
+
+        let spyGetNextPendingTask = sinon.spy(persistenceLayer, 'getNextPendingTask')
+        let spySetTaskProcessingTime = sinon.spy(persistenceLayer, 'setTaskProcessingTime')
+        let spyCancelTaskProcessing = sinon.spy(persistenceLayer, 'cancelTaskProcessing')
+        let spyFinishTaskProcessing = sinon.spy(persistenceLayer, 'finishTaskProcessing')
+        let spyGetNextPollingTime = sinon.spy(persistenceLayer, 'getNextPollingTime')
+        let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
+
+        let pencilPusher = new PencilPusher({
+            persistenceLayer
+        })
+
+        pencilPusher.defineTask('simple', {
+            implementation: () => {
+
+                return 'test output'
+
+            },
+            retention: {
+                period: moment.duration(5, 'years'),
+                storeOutput: true
+            }
+        })
+
+        let now = moment()
+
+        pencilPusher.scheduleTask({
+            name: 'simple',
+            input: null,
+            due: now.unix()
+        })
+
+        pencilPusher.start()
+
+        setTimeout(() => {
+
+            try {
+
+                expect(spyGetNextPendingTask.callCount).to.eql(2)
+                expect(spySetTaskProcessingTime.callCount).to.eql(1)
+                expect(spyCancelTaskProcessing.callCount).to.eql(0)
+                expect(spyFinishTaskProcessing.callCount).to.eql(1)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(1)
+
+                expect(calledWithArgs).to.eql([{
+                    task: {
+                        id: 0,
+                        name: 'simple',
+                        input: null,
+                        due: now.unix(),
+                        status: 'processing',
+                        processingUntil: now.clone().add(24, 'hours').unix()
+                    },
+                    retain: true,
+                    retainUntil: now.clone().add(5, 'years').unix(),
+                    storeOutput: true,
+                    output: 'test output'
+                }])
+
+            } finally {
+                pencilPusher.stop()
+            }
+
+            done()
+
+        }, DEFAULT_RUNNING_TIME+10)
+
+    })
+
+    it('should process and retain a task (default for retention = true)', (done) => {
+
+        let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+        let origFn = persistenceLayer.finishTaskProcessing
+        let calledWithArgs = null
+        persistenceLayer.finishTaskProcessing = (...args) => {
+            calledWithArgs = _.cloneDeep(args) // ...because the spy doesn't clone the args
+            return Reflect.apply(origFn, persistenceLayer, args)
+        }
+
+        let spyGetNextPendingTask = sinon.spy(persistenceLayer, 'getNextPendingTask')
+        let spySetTaskProcessingTime = sinon.spy(persistenceLayer, 'setTaskProcessingTime')
+        let spyCancelTaskProcessing = sinon.spy(persistenceLayer, 'cancelTaskProcessing')
+        let spyFinishTaskProcessing = sinon.spy(persistenceLayer, 'finishTaskProcessing')
+        let spyGetNextPollingTime = sinon.spy(persistenceLayer, 'getNextPollingTime')
+        let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
+
+        let pencilPusher = new PencilPusher({
+            persistenceLayer
+        })
+
+        pencilPusher.defineTask('simple', {
+            implementation: () => {
+
+                return 'test output'
+
+            },
+            retention: true
+        })
+
+        let now = moment()
+
+        pencilPusher.scheduleTask({
+            name: 'simple',
+            input: null,
+            due: now.unix()
+        })
+
+        pencilPusher.start()
+
+        setTimeout(() => {
+
+            try {
+
+                expect(spyGetNextPendingTask.callCount).to.eql(2)
+                expect(spySetTaskProcessingTime.callCount).to.eql(1)
+                expect(spyCancelTaskProcessing.callCount).to.eql(0)
+                expect(spyFinishTaskProcessing.callCount).to.eql(1)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(1)
+
+                expect(calledWithArgs).to.eql([{
+                    task: {
+                        id: 0,
+                        name: 'simple',
+                        input: null,
+                        due: now.unix(),
+                        status: 'processing',
+                        processingUntil: now.clone().add(24, 'hours').unix()
+                    },
+                    retain: true,
+                    retainUntil: Infinity,
+                    storeOutput: false,
+                    output: 'test output'
+                }])
+
+            } finally {
+                pencilPusher.stop()
+            }
+
+            done()
+
+        }, DEFAULT_RUNNING_TIME+10)
 
     })
 
