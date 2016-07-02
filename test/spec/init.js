@@ -253,6 +253,8 @@ describe('During initialization PencilPusher', () => {
 
         it('options.name', () => {
 
+            process.once('unhandledRejection', () => { /* Ignore it */ })
+
             return expect(pencilPusher.scheduleTask({
                 name: false
             })).to.eventually.be.rejectedWith('options.name must be a non-empty string.')
@@ -260,6 +262,8 @@ describe('During initialization PencilPusher', () => {
         })
 
         it('options.name.length', () => {
+
+            process.once('unhandledRejection', () => { /* Ignore it */ })
 
             return expect(pencilPusher.scheduleTask({
                 name: ''
@@ -269,6 +273,8 @@ describe('During initialization PencilPusher', () => {
 
         it('options.name defined', () => {
 
+            process.once('unhandledRejection', () => { /* Ignore it */ })
+
             return expect(pencilPusher.scheduleTask({
                 name: 'unknown'
             })).to.eventually.be.rejectedWith('No task definition for "unknown" found.')
@@ -277,6 +283,8 @@ describe('During initialization PencilPusher', () => {
 
         it('options.input', () => {
 
+            process.once('unhandledRejection', () => { /* Ignore it */ })
+
             return expect(pencilPusher.scheduleTask({
                 name: 'test'
             })).to.eventually.be.rejectedWith('options.input is required.')
@@ -284,6 +292,8 @@ describe('During initialization PencilPusher', () => {
         })
 
         it('options.due', () => {
+
+            process.once('unhandledRejection', () => { /* Ignore it */ })
 
             return expect(pencilPusher.scheduleTask({
                 name: 'test',
