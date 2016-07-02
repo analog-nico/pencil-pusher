@@ -119,14 +119,12 @@ describe('The error monitoring for task processing', () => {
             return Reflect.apply(origFn, pl, args)
         }
 
-        let errorsMonitored = 0
-        let lastErrMonitored = null
+        let errorsMonitored = []
 
         let pencilPusher = new PencilPusher({
             persistenceLayer: pl,
             errorMonitoring: (err) => {
-                errorsMonitored += 1
-                lastErrMonitored = err
+                errorsMonitored.push(err)
             }
         })
 
@@ -142,8 +140,9 @@ describe('The error monitoring for task processing', () => {
 
             try {
 
-                expect(errorsMonitored).to.eql(1)
-                expect(lastErrMonitored.message).to.eql('Failed to access the persistence layer with .cancelTaskProcessing() caused by: Failed!')
+                expect(errorsMonitored.length).to.eql(2)
+                expect(errorsMonitored[0].message).to.eql('Missing task definition for tasks named "simple"')
+                expect(errorsMonitored[1].message).to.eql('Failed to access the persistence layer with .cancelTaskProcessing() caused by: Failed!')
 
             } finally {
                 pencilPusher.stop()
@@ -168,14 +167,12 @@ describe('The error monitoring for task processing', () => {
             return Reflect.apply(origFn, pl, args)
         }
 
-        let errorsMonitored = 0
-        let lastErrMonitored = null
+        let errorsMonitored = []
 
         let pencilPusher = new PencilPusher({
             persistenceLayer: pl,
             errorMonitoring: (err) => {
-                errorsMonitored += 1
-                lastErrMonitored = err
+                errorsMonitored.push(err)
             }
         })
 
@@ -197,8 +194,9 @@ describe('The error monitoring for task processing', () => {
 
             try {
 
-                expect(errorsMonitored).to.eql(1)
-                expect(lastErrMonitored.message).to.eql('Failed to access the persistence layer with .cancelTaskProcessing() caused by: Failed!')
+                expect(errorsMonitored.length).to.eql(2)
+                expect(errorsMonitored[0].message).to.eql('Failed to execute a "simple" task caused by: Task failed!')
+                expect(errorsMonitored[1].message).to.eql('Failed to access the persistence layer with .cancelTaskProcessing() caused by: Failed!')
 
             } finally {
                 pencilPusher.stop()

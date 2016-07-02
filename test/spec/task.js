@@ -201,7 +201,8 @@ describe('PencilPusher\'s task management', () => {
         let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
 
         let pencilPusher = new PencilPusher({
-            persistenceLayer
+            persistenceLayer,
+            errorMonitoring: (xyz) => { /* Ignore */ }
         })
 
         persistenceLayer.storeNewTask({ task: {
@@ -244,7 +245,8 @@ describe('PencilPusher\'s task management', () => {
         let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
 
         let pencilPusher = new PencilPusher({
-            persistenceLayer
+            persistenceLayer,
+            errorMonitoring: (xyz) => { /* Ignore */ }
         })
 
         pencilPusher.defineTask('simple', {
@@ -293,7 +295,8 @@ describe('PencilPusher\'s task management', () => {
         let spyStoreNewTask = sinon.spy(persistenceLayer, 'storeNewTask')
 
         let pencilPusher = new PencilPusher({
-            persistenceLayer
+            persistenceLayer,
+            errorMonitoring: (xyz) => { /* Ignore */ }
         })
 
         let taskWasExecuted = 0
