@@ -48,6 +48,27 @@ describe('During initialization PencilPusher', () => {
             })
         }).not.to.throw()
 
+        expect(() => {
+            new PencilPusher({
+                persistenceLayer: new PencilPusher.MemoryPersistenceLayer(),
+                errorMonitoring: 'not a function'
+            })
+        }).to.throw('options.errorMonitoring must be a function with one parameter - e.g. function (err) { ... }')
+
+        expect(() => {
+            new PencilPusher({
+                persistenceLayer: new PencilPusher.MemoryPersistenceLayer(),
+                errorMonitoring: () => {}
+            })
+        }).to.throw('options.errorMonitoring must be a function with one parameter - e.g. function (err) { ... }')
+
+        expect(() => {
+            new PencilPusher({
+                persistenceLayer: new PencilPusher.MemoryPersistenceLayer(),
+                errorMonitoring: (xyz) => {}
+            })
+        }).to.not.throw()
+
     })
 
     it('should validate a task definition', () => {

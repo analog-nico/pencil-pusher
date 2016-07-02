@@ -10,6 +10,8 @@ let PencilPusher = require('../../')
 
 describe('PencilPusher\'s task management', () => {
 
+    const DEFAULT_RUNNING_TIME = 20
+
     it('should schedule and process a task', (done) => {
 
         let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
@@ -42,20 +44,24 @@ describe('PencilPusher\'s task management', () => {
 
         setTimeout(() => {
 
-            expect(spyGetNextPendingTask.callCount).to.eql(2)
-            expect(spySetTaskProcessingTime.callCount).to.eql(1)
-            expect(spyCancelTaskProcessing.callCount).to.eql(0)
-            expect(spyFinishTaskProcessing.callCount).to.eql(1)
-            expect(spyGetNextPollingTime.callCount).to.eql(1)
-            expect(spyStoreNewTask.callCount).to.eql(1)
+            try {
 
-            expect(taskWasExecuted).to.eql(true)
+                expect(spyGetNextPendingTask.callCount).to.eql(2)
+                expect(spySetTaskProcessingTime.callCount).to.eql(1)
+                expect(spyCancelTaskProcessing.callCount).to.eql(0)
+                expect(spyFinishTaskProcessing.callCount).to.eql(1)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(1)
 
-            pencilPusher.stop()
+                expect(taskWasExecuted).to.eql(true)
+
+            } finally {
+                pencilPusher.stop()
+            }
 
             done()
 
-        }, 10)
+        }, DEFAULT_RUNNING_TIME)
 
     })
 
@@ -97,23 +103,27 @@ describe('PencilPusher\'s task management', () => {
 
         setTimeout(() => {
 
-            expect(spyGetNextPendingTask.callCount).to.eql(3)
-            expect(spySetTaskProcessingTime.callCount).to.eql(2)
-            expect(spyCancelTaskProcessing.callCount).to.eql(0)
-            expect(spyFinishTaskProcessing.callCount).to.eql(2)
-            expect(spyGetNextPollingTime.callCount).to.eql(1)
-            expect(spyStoreNewTask.callCount).to.eql(2)
+            try {
 
-            expect(taskWasExecuted[0]).to.eql(true)
-            expect(taskWasExecuted[1]).to.eql(true)
+                expect(spyGetNextPendingTask.callCount).to.eql(3)
+                expect(spySetTaskProcessingTime.callCount).to.eql(2)
+                expect(spyCancelTaskProcessing.callCount).to.eql(0)
+                expect(spyFinishTaskProcessing.callCount).to.eql(2)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(2)
 
-            expect(spyGetNextPendingTask.secondCall.calledAfter(spyFinishTaskProcessing.firstCall)).to.eql(true)
+                expect(taskWasExecuted[0]).to.eql(true)
+                expect(taskWasExecuted[1]).to.eql(true)
 
-            pencilPusher.stop()
+                expect(spyGetNextPendingTask.secondCall.calledAfter(spyFinishTaskProcessing.firstCall)).to.eql(true)
+
+            } finally {
+                pencilPusher.stop()
+            }
 
             done()
 
-        }, 10)
+        }, DEFAULT_RUNNING_TIME)
 
     })
 
@@ -156,23 +166,27 @@ describe('PencilPusher\'s task management', () => {
 
         setTimeout(() => {
 
-            expect(spyGetNextPendingTask.callCount).to.eql(3)
-            expect(spySetTaskProcessingTime.callCount).to.eql(2)
-            expect(spyCancelTaskProcessing.callCount).to.eql(0)
-            expect(spyFinishTaskProcessing.callCount).to.eql(2)
-            expect(spyGetNextPollingTime.callCount).to.eql(1)
-            expect(spyStoreNewTask.callCount).to.eql(2)
+            try {
 
-            expect(taskWasExecuted[0]).to.eql(true)
-            expect(taskWasExecuted[1]).to.eql(true)
+                expect(spyGetNextPendingTask.callCount).to.eql(3)
+                expect(spySetTaskProcessingTime.callCount).to.eql(2)
+                expect(spyCancelTaskProcessing.callCount).to.eql(0)
+                expect(spyFinishTaskProcessing.callCount).to.eql(2)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(2)
 
-            expect(spyGetNextPendingTask.secondCall.calledBefore(spyFinishTaskProcessing.firstCall)).to.eql(true)
+                expect(taskWasExecuted[0]).to.eql(true)
+                expect(taskWasExecuted[1]).to.eql(true)
 
-            pencilPusher.stop()
+                expect(spyGetNextPendingTask.secondCall.calledBefore(spyFinishTaskProcessing.firstCall)).to.eql(true)
+
+            } finally {
+                pencilPusher.stop()
+            }
 
             done()
 
-        }, 10)
+        }, DEFAULT_RUNNING_TIME)
 
     })
 
@@ -200,18 +214,22 @@ describe('PencilPusher\'s task management', () => {
 
         setTimeout(() => {
 
-            expect(spyGetNextPendingTask.callCount).to.eql(2)
-            expect(spySetTaskProcessingTime.callCount).to.eql(0)
-            expect(spyCancelTaskProcessing.callCount).to.eql(1)
-            expect(spyFinishTaskProcessing.callCount).to.eql(0)
-            expect(spyGetNextPollingTime.callCount).to.eql(1)
-            expect(spyStoreNewTask.callCount).to.eql(1)
+            try {
 
-            pencilPusher.stop()
+                expect(spyGetNextPendingTask.callCount).to.eql(2)
+                expect(spySetTaskProcessingTime.callCount).to.eql(0)
+                expect(spyCancelTaskProcessing.callCount).to.eql(1)
+                expect(spyFinishTaskProcessing.callCount).to.eql(0)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(1)
+
+            } finally {
+                pencilPusher.stop()
+            }
 
             done()
 
-        }, 10)
+        }, DEFAULT_RUNNING_TIME)
 
     })
 
@@ -245,18 +263,22 @@ describe('PencilPusher\'s task management', () => {
 
         setTimeout(() => {
 
-            expect(spyGetNextPendingTask.callCount).to.eql(2)
-            expect(spySetTaskProcessingTime.callCount).to.eql(1)
-            expect(spyCancelTaskProcessing.callCount).to.eql(1)
-            expect(spyFinishTaskProcessing.callCount).to.eql(0)
-            expect(spyGetNextPollingTime.callCount).to.eql(1)
-            expect(spyStoreNewTask.callCount).to.eql(1)
+            try {
 
-            pencilPusher.stop()
+                expect(spyGetNextPendingTask.callCount).to.eql(2)
+                expect(spySetTaskProcessingTime.callCount).to.eql(1)
+                expect(spyCancelTaskProcessing.callCount).to.eql(1)
+                expect(spyFinishTaskProcessing.callCount).to.eql(0)
+                expect(spyGetNextPollingTime.callCount).to.eql(1)
+                expect(spyStoreNewTask.callCount).to.eql(1)
+
+            } finally {
+                pencilPusher.stop()
+            }
 
             done()
 
-        }, 10)
+        }, DEFAULT_RUNNING_TIME)
 
     })
 
