@@ -123,7 +123,7 @@ describe('PencilPusher\'s task management', () => {
 
             done()
 
-        }, DEFAULT_RUNNING_TIME+10)
+        }, DEFAULT_RUNNING_TIME + 10)
 
     })
 
@@ -152,7 +152,7 @@ describe('PencilPusher\'s task management', () => {
         pencilPusher.scheduleTask({
             name: 'simple',
             input: 0,
-            due: moment().unix()-1
+            due: moment().unix() - 1
         })
 
         pencilPusher.scheduleTask({
@@ -215,7 +215,7 @@ describe('PencilPusher\'s task management', () => {
         pencilPusher.scheduleTask({
             name: 'simple',
             input: 0,
-            due: moment().unix()-1
+            due: moment().unix() - 1
         })
 
         pencilPusher.scheduleTask({
@@ -328,7 +328,7 @@ describe('PencilPusher\'s task management', () => {
 
             done()
 
-        }, DEFAULT_RUNNING_TIME+10)
+        }, DEFAULT_RUNNING_TIME + 10)
 
     })
 
@@ -405,7 +405,7 @@ describe('PencilPusher\'s task management', () => {
 
             done()
 
-        }, DEFAULT_RUNNING_TIME+10)
+        }, DEFAULT_RUNNING_TIME + 10)
 
     })
 

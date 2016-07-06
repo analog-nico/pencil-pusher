@@ -10,6 +10,8 @@ describe('During initialization PencilPusher', () => {
 
     it('should validate the options of new PencilPusher(...)', () => {
 
+        /* eslint-disable no-new */
+
         expect(() => {
             new PencilPusher()
         }).to.throw('options.persistenceLayer must extend PencilPusher.PersistenceLayerBase')
@@ -68,6 +70,8 @@ describe('During initialization PencilPusher', () => {
                 errorMonitoring: (xyz) => {}
             })
         }).to.not.throw()
+
+        /* eslint-enable no-new */
 
     })
 

@@ -26,7 +26,7 @@ describe('MemoryPersistenceLayer', () => {
 
         // Store task
 
-        let due = moment().unix()-1
+        let due = moment().unix() - 1
         let task = {
             name: 'test',
             input: 'some input',
@@ -71,7 +71,7 @@ describe('MemoryPersistenceLayer', () => {
             status: persistenceLayer.STATUS.PROCESSING,
             processingUntil: until
         })
-        expect(persistenceLayer.getNextPollingTime()).to.eql(until+1)
+        expect(persistenceLayer.getNextPollingTime()).to.eql(until + 1)
 
         // Finish processing
 
@@ -116,10 +116,10 @@ describe('MemoryPersistenceLayer', () => {
                 due: moment().unix()
             }
             let taskPastDue1 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-1
+                due: taskDue.due - 1
             })
             let taskPastDue2 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-2
+                due: taskDue.due - 2
             })
 
             persistenceLayer.storeNewTask({ task: taskPastDue1 })
@@ -160,7 +160,7 @@ describe('MemoryPersistenceLayer', () => {
             expect(persistenceLayer.getNextPendingTask()).to.eql(task)
             expect(task.status).to.eql(persistenceLayer.STATUS.PROCESSING)
 
-            persistenceLayer.setTaskProcessingTime({ task, until: moment().unix()-1 }) // timed out
+            persistenceLayer.setTaskProcessingTime({ task, until: moment().unix() - 1 }) // timed out
 
             expect(persistenceLayer.getNextPendingTask()).to.eql(task)
             expect(persistenceLayer.getNextPendingTask()).to.eql(null)
@@ -234,8 +234,8 @@ describe('MemoryPersistenceLayer', () => {
             expect(persistenceLayer.getNextPendingTask()).to.not.eql(null)
             expect(persistenceLayer.getNextPendingTask()).to.not.eql(null)
 
-            persistenceLayer.setTaskProcessingTime({ task: task1, until: moment().unix()-1 })
-            persistenceLayer.setTaskProcessingTime({ task: task2, until: moment().unix()+2 })
+            persistenceLayer.setTaskProcessingTime({ task: task1, until: moment().unix() - 1 })
+            persistenceLayer.setTaskProcessingTime({ task: task2, until: moment().unix() + 2 })
 
             expect(persistenceLayer.getNextPendingTask()).to.eql(task1) // timed out
             expect(persistenceLayer.getNextPendingTask()).to.eql(null) // still processing
@@ -375,10 +375,10 @@ describe('MemoryPersistenceLayer', () => {
             let taskDue1 = {
                 name: 'test',
                 input: 'some input',
-                due: moment().unix()+1
+                due: moment().unix() + 1
             }
             let taskDue2 = _.assign(_.clone(taskDue1), {
-                due: taskDue1.due+2
+                due: taskDue1.due + 2
             })
 
             persistenceLayer.storeNewTask({ task: taskDue2 })
@@ -396,10 +396,10 @@ describe('MemoryPersistenceLayer', () => {
                 due: moment().unix()
             }
             let taskPastDue1 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-1
+                due: taskDue.due - 1
             })
             let taskPastDue2 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-2
+                due: taskDue.due - 2
             })
 
             persistenceLayer.storeNewTask({ task: taskPastDue1 })
@@ -418,10 +418,10 @@ describe('MemoryPersistenceLayer', () => {
                 due: moment().unix()
             }
             let taskPastDue1 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-1
+                due: taskDue.due - 1
             })
             let taskPastDue2 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-2
+                due: taskDue.due - 2
             })
 
             persistenceLayer.storeNewTask({ task: taskPastDue1 })
@@ -442,10 +442,10 @@ describe('MemoryPersistenceLayer', () => {
                 due: moment().unix()
             }
             let taskPastDue1 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-1
+                due: taskDue.due - 1
             })
             let taskPastDue2 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-2
+                due: taskDue.due - 2
             })
 
             persistenceLayer.storeNewTask({ task: taskPastDue1 })
@@ -471,10 +471,10 @@ describe('MemoryPersistenceLayer', () => {
                 due: moment().unix()
             }
             let taskPastDue1 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-1
+                due: taskDue.due - 1
             })
             let taskPastDue2 = _.assign(_.clone(taskDue), {
-                due: taskDue.due-2
+                due: taskDue.due - 2
             })
 
             persistenceLayer.storeNewTask({ task: taskPastDue1 })
@@ -519,7 +519,7 @@ describe('MemoryPersistenceLayer', () => {
                 until: timingOutOn
             })
 
-            expect(persistenceLayer.getNextPollingTime()).to.eql(timingOutOn+1)
+            expect(persistenceLayer.getNextPollingTime()).to.eql(timingOutOn + 1)
 
         })
 
