@@ -36,6 +36,8 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v0.0.2 (2017-09-03)
+    - Fix: do time calculations in utc to avoid dst switching issues
 - v0.0.1 (2016-07-02)
     - Initial version
 
