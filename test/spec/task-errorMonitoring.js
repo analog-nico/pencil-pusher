@@ -1,6 +1,7 @@
 'use strict'
 
 let moment = require('moment')
+let BPromise = require('bluebird')
 
 let MemoryPersistenceLayer = require('../../lib/persistence-layer/MemoryPersistenceLayer.js')
 let PencilPusher = require('../../')
@@ -400,6 +401,58 @@ describe('The error monitoring for task processing', () => {
             done()
 
         }, DEFAULT_RUNNING_TIME)
+
+    })
+
+    it('should report task execution taking too long', (done) => {
+
+        let pl = new MemoryPersistenceLayer()
+
+        let errorsMonitored = []
+
+        let pencilPusher = new PencilPusher({
+            persistenceLayer: pl,
+            errorMonitoring: (err) => {
+                errorsMonitored.push(err)
+            }
+        })
+
+        pencilPusher.defineTask('simple', {
+            implementation: () => {
+                return BPromise.delay(1050)
+            },
+            execution: {
+                completesWithin: 1 // second
+            }
+        })
+
+        pencilPusher.scheduleTask({
+            name: 'simple',
+            input: null,
+            due: moment().unix()
+        })
+
+        pencilPusher.start()
+
+        setTimeout(() => {
+
+            try {
+
+                expect(errorsMonitored.length).to.eql(2)
+                expect(errorsMonitored[0].message).to.eql('Executing a "simple" task is taking too long')
+                try {
+                    expect(errorsMonitored[1].message).to.eql('Executing a "simple" task took 0 times longer than expected')
+                } catch (e) {
+                    expect(errorsMonitored[1].message).to.eql('Executing a "simple" task took 1 times longer than expected')
+                }
+
+            } finally {
+                pencilPusher.stop()
+            }
+
+            done()
+
+        }, 1100)
 
     })
 
