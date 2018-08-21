@@ -1,6 +1,6 @@
 {
   "name": "pencil-pusher",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Pushing tasks and eventually workflows -> business process automation",
   "main": "./index.js",
   "scripts": {

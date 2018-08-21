@@ -36,7 +36,7 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
-- v0.0.3 (upcoming)
+- v0.0.3 (2018-08-21)
     - Feat: tracking if a task is taking too long
         - Forwarding `TaskExecutionTakingTooLongError` to error monitoring when task execution surpasses `execution.completesWithin` duration
         - Forwarding `TaskExecutionTakingTooLongFinishedError` to error monitoring when task finishes past `execution.completesWithin` duration
