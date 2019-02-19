@@ -1,5 +1,6 @@
 'use strict'
 
+let BPromise = require('bluebird')
 let moment = require('moment')
 
 let MainExecutionContext = require('../../lib/execution-context/MainExecutionContext.js')
@@ -266,6 +267,8 @@ describe('During initialization PencilPusher', () => {
     describe('should validate a scheduled task', () => {
 
         let pencilPusher = null
+        let unhandledRejectionCount = 0
+        let unhandledRejectionHandler = () => { unhandledRejectionCount += 1 }
 
         before(() => {
 
@@ -274,11 +277,18 @@ describe('During initialization PencilPusher', () => {
             })
             pencilPusher.defineTask('test', { implementation: () => {} })
 
+            unhandledRejectionCount = 0
+            process.on('unhandledRejection', unhandledRejectionHandler)
+
+        })
+
+        after(() => {
+
+            process.removeListener('unhandledRejection', unhandledRejectionHandler)
+
         })
 
         it('options.name', () => {
-
-            process.once('unhandledRejection', () => { /* Ignore it */ })
 
             return expect(pencilPusher.scheduleTask({
                 name: false
@@ -288,8 +298,6 @@ describe('During initialization PencilPusher', () => {
 
         it('options.name.length', () => {
 
-            process.once('unhandledRejection', () => { /* Ignore it */ })
-
             return expect(pencilPusher.scheduleTask({
                 name: ''
             })).to.eventually.be.rejectedWith('options.name must be a non-empty string.')
@@ -297,8 +305,6 @@ describe('During initialization PencilPusher', () => {
         })
 
         it('options.name defined', () => {
-
-            process.once('unhandledRejection', () => { /* Ignore it */ })
 
             return expect(pencilPusher.scheduleTask({
                 name: 'unknown'
@@ -308,8 +314,6 @@ describe('During initialization PencilPusher', () => {
 
         it('options.input', () => {
 
-            process.once('unhandledRejection', () => { /* Ignore it */ })
-
             return expect(pencilPusher.scheduleTask({
                 name: 'test'
             })).to.eventually.be.rejectedWith('options.input is required.')
@@ -317,8 +321,6 @@ describe('During initialization PencilPusher', () => {
         })
 
         it('options.due', () => {
-
-            process.once('unhandledRejection', () => { /* Ignore it */ })
 
             return expect(pencilPusher.scheduleTask({
                 name: 'test',
@@ -335,6 +337,15 @@ describe('During initialization PencilPusher', () => {
                 input: 'some input',
                 due: 0
             })).to.eventually.be.fulfilled
+
+        })
+
+        it('check unhandledRejection count', () => {
+
+            return BPromise.delay()
+                .then(() => {
+                    expect(unhandledRejectionCount).to.eql(5)
+                })
 
         })
 
