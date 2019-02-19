@@ -2,7 +2,9 @@
 
 [![Build Status](https://img.shields.io/travis/analog-nico/pencil-pusher/master.svg?style=flat-square)](https://travis-ci.org/analog-nico/pencil-pusher)
 [![Coverage Status](https://img.shields.io/coveralls/analog-nico/pencil-pusher.svg?style=flat-square)](https://coveralls.io/r/analog-nico/pencil-pusher)
-[![Dependency Status](https://img.shields.io/gemnasium/analog-nico/pencil-pusher.svg?style=flat-square)](https://gemnasium.com/github.com/analog-nico/pencil-pusher)
+[![Dependency Status](https://img.shields.io/david/analog-nico/pencil-pusher.svg?style=flat-square)](https://david-dm.org/analog-nico/pencil-pusher)
+[![Known Vulnerabilities](https://snyk.io/test/npm/pencil-pusher/badge.svg?style=flat-square)](https://snyk.io/test/npm/pencil-pusher)
+
 
 Description forthcoming.
 
