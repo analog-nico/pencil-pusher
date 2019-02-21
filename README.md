@@ -38,6 +38,9 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v0.0.4 (2019-02-21)
+    - Feat: Supporting `maxConcurrentTasks` on the task definition level. For the task type `options.execution.maxConcurrentTasks` overwrites the global `maxConcurrentTasks` if it is lower than the global value.
+      To support this setting, custom persistence layer implementations have to process the new `excludeTasksWithNames` parameter of the `getNextPendingTask` and `getNextPollingTime` functions. See `PersistenceLayerBase` for details.
 - v0.0.3 (2018-08-21)
     - Feat: tracking if a task is taking too long
         - Forwarding `TaskExecutionTakingTooLongError` to error monitoring when task execution surpasses `execution.completesWithin` duration
