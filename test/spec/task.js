@@ -558,4 +558,524 @@ describe('PencilPusher\'s task management', () => {
 
     })
 
+    describe('with a maxConcurrentTasks limit', () => {
+
+        describe('on PencilPusher', () => {
+
+            it('should execute max tasks in parallel', (done) => {
+
+                let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+                let pencilPusher = new PencilPusher({
+                    persistenceLayer,
+                    maxConcurrentTasks: 2
+                })
+
+                let runningTasks = 0
+                let maxRunningTasks = 0
+
+                pencilPusher.defineTask('simple', {
+                    implementation: (id) => {
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+
+                        return BPromise.delay()
+                            .then(() => {
+
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                            })
+
+                    }
+                })
+
+                let task = {
+                    name: 'simple',
+                    input: null,
+                    due: moment().unix()
+                }
+
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+
+                pencilPusher.start()
+
+                setTimeout(() => {
+
+                    try {
+
+                        expect(maxRunningTasks).to.be.below(3)
+
+                    } finally {
+                        pencilPusher.stop()
+                    }
+
+                    done()
+
+                }, DEFAULT_RUNNING_TIME)
+
+            })
+
+        })
+
+        describe('on a task', () => {
+
+            it('should execute max tasks according to lower task definition', (done) => {
+
+                let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+                let pencilPusher = new PencilPusher({
+                    persistenceLayer,
+                    maxConcurrentTasks: 3 // <-----------
+                })
+
+                let runningTasks = 0
+                let maxRunningTasks = 0
+
+                pencilPusher.defineTask('simple', {
+                    implementation: (id) => {
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+
+                        return BPromise.delay()
+                            .then(() => {
+
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                            })
+
+                    },
+                    execution: {
+                        maxConcurrentTasks: 2 // <-----------
+                    }
+                })
+
+                let task = {
+                    name: 'simple',
+                    input: null,
+                    due: moment().unix()
+                }
+
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+
+                pencilPusher.start()
+
+                setTimeout(() => {
+
+                    try {
+
+                        expect(maxRunningTasks).to.be.below(3)
+
+                    } finally {
+                        pencilPusher.stop()
+                    }
+
+                    done()
+
+                }, DEFAULT_RUNNING_TIME)
+
+            })
+
+            it('should execute max tasks according to lower PencilPusher definition', (done) => {
+
+                let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+                let pencilPusher = new PencilPusher({
+                    persistenceLayer,
+                    maxConcurrentTasks: 2 // <-----------
+                })
+
+                let runningTasks = 0
+                let maxRunningTasks = 0
+
+                pencilPusher.defineTask('simple', {
+                    implementation: (id) => {
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+
+                        return BPromise.delay()
+                            .then(() => {
+
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                            })
+
+                    },
+                    execution: {
+                        maxConcurrentTasks: 3 // <-----------
+                    }
+                })
+
+                let task = {
+                    name: 'simple',
+                    input: null,
+                    due: moment().unix()
+                }
+
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+                pencilPusher.scheduleTask(task)
+
+                pencilPusher.start()
+
+                setTimeout(() => {
+
+                    try {
+
+                        expect(maxRunningTasks).to.be.below(3)
+
+                    } finally {
+                        pencilPusher.stop()
+                    }
+
+                    done()
+
+                }, DEFAULT_RUNNING_TIME)
+
+            })
+
+            it('should execute other tasks first that did not reach max capacity', (done) => {
+
+                let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+                let pencilPusher = new PencilPusher({
+                    persistenceLayer,
+                    maxConcurrentTasks: 2 // <-----------
+                })
+
+                let order = []
+                let runningTasks = 0
+                let maxRunningTasks = 0
+
+                pencilPusher.defineTask('simple', {
+                    implementation: (id) => {
+
+                        // console.log(`${ id } start`)
+
+                        order.push(id)
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+
+                        return BPromise.delay()
+                            .then(() => {
+
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                                // console.log(`${ id } end`)
+
+                            })
+
+                    }
+                })
+
+                let runningTasksLimited = 0
+                let maxRunningTasksLimited = 0
+
+                pencilPusher.defineTask('limited', {
+                    implementation: (id) => {
+
+                        // console.log(`${ id } start`)
+
+                        order.push(id)
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+                        runningTasksLimited += 1
+                        if (runningTasksLimited > maxRunningTasksLimited) {
+                            maxRunningTasksLimited = runningTasksLimited
+                        }
+
+                        return BPromise.delay()
+                            .then(() => {
+
+                                if (runningTasksLimited > maxRunningTasksLimited) {
+                                    maxRunningTasksLimited = runningTasksLimited
+                                }
+                                runningTasksLimited -= 1
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                                // console.log(`${ id } end`)
+
+                            })
+
+                    },
+                    execution: {
+                        maxConcurrentTasks: 1 // <-----------
+                    }
+                })
+
+                let now = moment().unix()
+
+                pencilPusher.scheduleTask({
+                    name: 'limited',
+                    input: 1,
+                    due: now - 6
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'limited',
+                    input: 2,
+                    due: now - 5
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'simple',
+                    input: 3,
+                    due: now - 4
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'simple',
+                    input: 4,
+                    due: now - 3
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'simple',
+                    input: 5,
+                    due: now - 2
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'limited',
+                    input: 6,
+                    due: now - 1
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'simple',
+                    input: 7,
+                    due: now
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'limited',
+                    input: 8,
+                    due: now + 999999
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'simple',
+                    input: 9,
+                    due: now + 999999
+                })
+
+                pencilPusher.start()
+
+                setTimeout(() => {
+
+                    try {
+
+                        expect(maxRunningTasks).to.be.below(3)
+                        expect(maxRunningTasksLimited).to.be.below(2)
+
+                        expect(order).to.eql([1, 3, 2, 4, 5, 6, 7])
+
+                    } finally {
+                        pencilPusher.stop()
+                    }
+
+                    done()
+
+                }, DEFAULT_RUNNING_TIME)
+
+            })
+
+            it('should fight the monkey', (done) => {
+
+                let persistenceLayer = new PencilPusher.MemoryPersistenceLayer()
+
+                let pencilPusher = new PencilPusher({
+                    persistenceLayer,
+                    maxConcurrentTasks: 3 // <-----------
+                })
+
+                let runningTasks = 0
+                let maxRunningTasks = 0
+
+                pencilPusher.defineTask('simple', {
+                    implementation: () => {
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+
+                        return BPromise.delay(_.random(0, 20))
+                            .then(() => {
+
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                            })
+
+                    }
+                })
+
+                let runningTasksLimited1 = 0
+                let maxRunningTasksLimited1 = 0
+
+                pencilPusher.defineTask('limited1', {
+                    implementation: () => {
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+                        runningTasksLimited1 += 1
+                        if (runningTasksLimited1 > maxRunningTasksLimited1) {
+                            maxRunningTasksLimited1 = runningTasksLimited1
+                        }
+
+                        return BPromise.delay(_.random(0, 20))
+                            .then(() => {
+
+                                if (runningTasksLimited1 > maxRunningTasksLimited1) {
+                                    maxRunningTasksLimited1 = runningTasksLimited1
+                                }
+                                runningTasksLimited1 -= 1
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                            })
+
+                    },
+                    execution: {
+                        maxConcurrentTasks: 1 // <-----------
+                    }
+                })
+
+                let runningTasksLimited2 = 0
+                let maxRunningTasksLimited2 = 0
+
+                pencilPusher.defineTask('limited2', {
+                    implementation: () => {
+
+                        runningTasks += 1
+                        if (runningTasks > maxRunningTasks) {
+                            maxRunningTasks = runningTasks
+                        }
+                        runningTasksLimited2 += 1
+                        if (runningTasksLimited2 > maxRunningTasksLimited2) {
+                            maxRunningTasksLimited2 = runningTasksLimited2
+                        }
+
+                        return BPromise.delay(_.random(0, 20))
+                            .then(() => {
+
+                                if (runningTasksLimited2 > maxRunningTasksLimited2) {
+                                    maxRunningTasksLimited2 = runningTasksLimited2
+                                }
+                                runningTasksLimited2 -= 1
+                                if (runningTasks > maxRunningTasks) {
+                                    maxRunningTasks = runningTasks
+                                }
+                                runningTasks -= 1
+
+                            })
+
+                    },
+                    execution: {
+                        maxConcurrentTasks: 2 // <-----------
+                    }
+                })
+
+                let now = moment().unix()
+
+                for ( let i = -500; i < -1; i+=1 ) {
+                    pencilPusher.scheduleTask({
+                        name: ['simple', 'limited1', 'limited2'][_.random(0, 2)],
+                        input: null,
+                        due: now - i
+                    })
+                }
+
+                pencilPusher.defineTask('end', {
+                    implementation: (endNow) => {
+
+                        if (!endNow) {
+                            return
+                        }
+
+                        try {
+
+                            expect(maxRunningTasks).to.be.below(4)
+                            expect(maxRunningTasksLimited1).to.be.below(2)
+                            expect(maxRunningTasksLimited2).to.be.below(3)
+
+                        } finally {
+                            pencilPusher.stop()
+                        }
+
+                        done()
+
+                    }
+                })
+
+                pencilPusher.scheduleTask({
+                    name: 'end',
+                    input: false,
+                    due: now-1
+                })
+                pencilPusher.scheduleTask({
+                    name: 'end',
+                    input: false,
+                    due: now-1
+                })
+                pencilPusher.scheduleTask({
+                    name: 'end',
+                    input: true,
+                    due: now
+                })
+
+                pencilPusher.start()
+
+            })
+
+        })
+
+    })
+
 })

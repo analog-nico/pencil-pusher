@@ -211,6 +211,33 @@ describe('MemoryPersistenceLayer', () => {
 
         })
 
+        it('should not return excluded tasks', () => {
+
+            let task = {
+                name: 'test',
+                input: 'some input',
+                due: moment().unix()
+            }
+            let taskExcluded1 = _.assign(_.clone(task), {
+                name: 'test2'
+            })
+            let taskExcluded2 = _.assign(_.clone(task), {
+                name: 'test3'
+            })
+
+            persistenceLayer.storeNewTask({ task })
+            persistenceLayer.storeNewTask({ task: taskExcluded1 })
+            persistenceLayer.storeNewTask({ task: taskExcluded2 })
+
+            expect(persistenceLayer.getNextPendingTask(['test2', 'test3'])).to.eql(task)
+            expect(persistenceLayer.getNextPendingTask(['test2', 'test3'])).to.eql(null)
+            expect(persistenceLayer.getNextPendingTask(['test2'])).to.eql(taskExcluded2)
+            expect(persistenceLayer.getNextPendingTask(['test2'])).to.eql(null)
+            expect(persistenceLayer.getNextPendingTask()).to.eql(taskExcluded1)
+            expect(persistenceLayer.getNextPendingTask()).to.eql(null)
+
+        })
+
     })
 
     describe('.setTaskProcessingTime(...)', () => {
@@ -520,6 +547,46 @@ describe('MemoryPersistenceLayer', () => {
             })
 
             expect(persistenceLayer.getNextPollingTime()).to.eql(timingOutOn + 1)
+
+        })
+
+        it('should ignore excluded tasks', () => {
+
+            let now = moment().unix()
+            let later1 = now + 3
+            let later2 = now + 6
+            let later3 = now + 9
+
+            persistenceLayer.storeNewTask({
+                task: {
+                    name: 'test1',
+                    input: 'some input',
+                    due: later1
+                }
+            })
+            persistenceLayer.storeNewTask({
+                task: {
+                    name: 'test2',
+                    input: 'some input',
+                    due: later2
+                }
+            })
+            persistenceLayer.storeNewTask({
+                task: {
+                    name: 'test3',
+                    input: 'some input',
+                    due: later3
+                }
+            })
+
+            expect(persistenceLayer.getNextPollingTime()).to.eql(later1)
+            expect(persistenceLayer.getNextPollingTime(['test1'])).to.eql(later2)
+            expect(persistenceLayer.getNextPollingTime(['test2'])).to.eql(later1)
+            expect(persistenceLayer.getNextPollingTime(['test3'])).to.eql(later1)
+            expect(persistenceLayer.getNextPollingTime(['test1', 'test2'])).to.eql(later3)
+            expect(persistenceLayer.getNextPollingTime(['test1', 'test3'])).to.eql(later2)
+            expect(persistenceLayer.getNextPollingTime(['test2', 'test3'])).to.eql(later1)
+            expect(persistenceLayer.getNextPollingTime(['test1', 'test2', 'test3'])).to.eql(null)
 
         })
 

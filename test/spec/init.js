@@ -158,6 +158,60 @@ describe('During initialization PencilPusher', () => {
         }).to.not.throw()
 
         expect(() => {
+            pencilPusher.defineTask('test12', {
+                implementation: () => {},
+                execution: {
+                    maxConcurrentTasks: null
+                }
+            })
+        }).to.throw('options.execution.maxConcurrentTasks must be a positive integer.')
+
+        expect(() => {
+            pencilPusher.defineTask('test12', {
+                implementation: () => {},
+                execution: {
+                    maxConcurrentTasks: 'wrong type'
+                }
+            })
+        }).to.throw('options.execution.maxConcurrentTasks must be a positive integer.')
+
+        expect(() => {
+            pencilPusher.defineTask('test12', {
+                implementation: () => {},
+                execution: {
+                    maxConcurrentTasks: 0
+                }
+            })
+        }).to.throw('options.execution.maxConcurrentTasks must be a positive integer.')
+
+        expect(() => {
+            pencilPusher.defineTask('test12', {
+                implementation: () => {},
+                execution: {
+                    maxConcurrentTasks: -1
+                }
+            })
+        }).to.throw('options.execution.maxConcurrentTasks must be a positive integer.')
+
+        expect(() => {
+            pencilPusher.defineTask('test12', {
+                implementation: () => {},
+                execution: {
+                    maxConcurrentTasks: 0.5
+                }
+            })
+        }).to.throw('options.execution.maxConcurrentTasks must be a positive integer.')
+
+        expect(() => {
+            pencilPusher.defineTask('test12', {
+                implementation: () => {},
+                execution: {
+                    maxConcurrentTasks: 1
+                }
+            })
+        }).to.not.throw()
+
+        expect(() => {
             pencilPusher.defineTask('test5', {
                 implementation: () => {},
                 retention: 'wrong type'
