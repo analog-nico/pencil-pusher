@@ -4,7 +4,9 @@
   "description": "Pushing tasks and eventually workflows -> business process automation",
   "main": "./index.js",
   "scripts": {
-    "test": "./node_modules/.bin/gulp ci"
+    "test": "./node_modules/.bin/gulp ci",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,8 @@
     "bluebird": "^3.4.1",
     "jsck": "^0.3.0",
     "lodash": "^4.17.11",
-    "moment": "^2.19.3"
+    "moment": "^2.19.3",
+    "snyk": "^1.192.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -50,5 +53,6 @@
     "rimraf": "^2.5.2",
     "run-sequence": "^1.2.2",
     "sinon": "^1.17.4"
-  }
+  },
+  "snyk": true
 }
